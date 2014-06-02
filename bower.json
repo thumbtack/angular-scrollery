@@ -1,0 +1,24 @@
+{
+    "name": "angular-scrollery",
+    "version": "0.1.0",
+    "authors": [
+        "Katie Thomas <kthomas@thumbtack.com>",
+    ],
+    "description": "Scroll-based animation framework in AngularJS.",
+    "main": ["src/angular-scrollery.js"],
+    "keywords": [
+        "scroll",
+        "scrolling",
+        "animation",
+        "scroll-based",
+        "angular"
+    ],
+    "license": "MIT",
+    "homepage": "github.com/thumbtack/angular-scrollery",
+    "ignore": [
+        "**/.*"
+    ],
+    "dependencies": {
+        "angular": "1.*"
+    }
+}
