@@ -1,16 +1,7 @@
 (function() {
 "use strict";
 
-var app = angular.module("angular-scrolling", []);
-
-app.config([
-    "$interpolateProvider",
-    function($interpolateProvider) {
-        // Since Twig uses braces, use brackets for Angular things
-        $interpolateProvider.startSymbol("[[");
-        $interpolateProvider.endSymbol("]]");
-    }
-]);
+var app = angular.module("angular-scrollery", ["angular-scrollery-config"]);
 
 app.service("directiveNotifier", ["$rootScope", function($rootScope) {
     return {
@@ -28,66 +19,8 @@ app.service("windowScroll", ["$window", function($window) {
     }
 }]);
 
-app.service("stepStructure", function() {
-    // 81 is the height of the sticky header
-    var beforeAnimationHeight = $(".scrolling-animation").position()["top"] - 81;
-    var steps = [
-        {
-            name: "stepZeroScrollToAnimation",
-            start: 0,
-            duration: beforeAnimationHeight
-        },
-        {
-            name: "stepOneCopyAndClock",
-            start: beforeAnimationHeight,
-            duration: 300
-        },
-        {
-            name: "stepTwoIntroOne",
-            start: beforeAnimationHeight + 300,
-            duration: 200
-        },
-        {
-            name: "stepThreeIntroTwo",
-            start: beforeAnimationHeight + 500,
-            duration: 200
-        },
-        {
-            name: "stepFourIntroThree",
-            start: beforeAnimationHeight + 700,
-            duration: 200
-        },
-        {
-            name: "stepFiveHighlightElizabeth",
-            start: beforeAnimationHeight + 900,
-            duration: 600
-        },
-        {
-            name: "stepSixQuotesTransition",
-            start: beforeAnimationHeight + 1500,
-            duration: 400
-        },
-        {
-            name: "stepSevenExplore",
-            start: beforeAnimationHeight + 1900,
-            duration: 400
-        },
-        {
-            name: "stepEightHired",
-            start: beforeAnimationHeight + 2300,
-            duration: 400
-        },
-        {
-            name: "stepNineDelay",
-            start: beforeAnimationHeight + 2700,
-            duration: 550
-        },
-        {
-            name: "stepTenEnd",
-            start: beforeAnimationHeight + 3250,
-            duration: 5
-        }
-    ];
+app.service("stepStructure", ["scrolleryConfig", function(scrolleryConfig) {
+    var steps = scrolleryConfig.getSteps();
     return {
         getStepStructure: function() {
             return steps;
@@ -106,7 +39,7 @@ app.service("stepStructure", function() {
             return duration;
         }
     }
-});
+}]);
 
 app.controller("ScrollerController", [
     "$scope", "$window", "$interval", "directiveNotifier", "windowScroll", "stepStructure",
