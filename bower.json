@@ -2,7 +2,7 @@
     "name": "angular-scrollery",
     "version": "0.1.0",
     "authors": [
-        "Katie Thomas <kthomas@thumbtack.com>",
+        "Katie Thomas <kthomas@thumbtack.com>"
     ],
     "description": "Scroll-based animation framework in AngularJS.",
     "main": ["src/angular-scrollery.js", "src/angular-scrollery-config.js"],
