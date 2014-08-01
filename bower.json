@@ -5,7 +5,7 @@
         "Katie Thomas <kthomas@thumbtack.com>",
     ],
     "description": "Scroll-based animation framework in AngularJS.",
-    "main": ["src/angular-scrollery.js"],
+    "main": ["src/angular-scrollery.js", "src/angular-scrollery-config.js"],
     "keywords": [
         "scroll",
         "scrolling",
