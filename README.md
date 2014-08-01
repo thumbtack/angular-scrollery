@@ -16,4 +16,4 @@ Configuration is handled in angular-scrollery-config.js which is injected into t
 Usage
 ---------------------
 
-Blog post coming soon.
+https://www.thumbtack.com/engineering/angular-scrollery/
