@@ -1,0 +1,43 @@
+.animation-container {
+    position: absolute;
+    width: 400px;
+    height: 2500px;
+    left: 50%;
+    margin-top: 60px;
+    margin-left: -200px;
+}
+
+.rocket {
+    background: url("images/rocket2.png") center top no-repeat;
+    height: 700px;
+    width: 400px;
+    position: fixed;
+    z-index: 1;
+}
+
+.fire {
+    background: url("images/fire.gif") center top no-repeat;
+    height: 400px;
+    width: 400px;
+    position: fixed;
+    top: 550px;
+    z-index: 0;
+    opacity: 0;
+}
+
+.cloud {
+    background: url("images/cloud.png") center no-repeat;
+    height: 300px;
+    width: 300px;
+    position: fixed;
+    top: 550px;
+    left: 50%;
+    z-index: 2;
+    opacity: 0;
+}
+
+.cloud-2 {
+    z-index: 3;
+    margin-left: -275px;
+}
+

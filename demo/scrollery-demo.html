@@ -1,17 +1,32 @@
 <html>
     <head>
         <title>angular-scrollery-demo</title>
+        <link rel="stylesheet" type="text/css" href="demo.css">
     </head>
     <body>
-        <div ng-controller="ScrollerController">
-            <p scroll-behavior animations="[{0: {translateY: [0,300]}}]">hello</p>
+        <div class="animation-container" ng-controller="ScrollerController">
+            <div class="rocket" scroll-behavior animations="[[{ 2: {translateY: [0, -875]} }]]"></div>
+            <div class="fire" scroll-behavior animations="[[{
+                    0: {opacity: [0, 1]},
+                    2: {translateY: [0, -875]}
+                }]]"></div>
+            <div class="cloud" scroll-behavior animations="[[{
+                    1: {opacity: [0, 1]},
+                    2: {rotate: [0, 360], opacity: [1, 0] }
+                }]]"></div>
+            <div class="cloud cloud-2" scroll-behavior animations="[[{
+                    1: { opacity: [0, 1]},
+                    2: {rotate: [0, 360], opacity: [1, 0] }
+                }]]"></div>
         </div>
     </body>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.14/angular.js"></script>
     <script type="text/javascript" src="angular-scrollery-config.js"></script>
-    <script type="text/javascript" src="../src/angular-scroller.js"></script>
+    <script type="text/javascript" src="../src/angular-scrollery.js"></script>
     <script type="text/javascript">
-        angular.bootstrap(angular.element("body"), ["angular-scrollery-config"]);
+        $(document).ready(function() {
+            angular.bootstrap(angular.element("body"), ["angular-scrollery"]);
+        })
     </script>
 </html>

@@ -3,12 +3,30 @@
 
 var app = angular.module("angular-scrollery", ["angular-scrollery-config"]);
 
-app.service("directiveNotifier", ["$rootScope", function($rootScope) {
-    return {
-        notifyChange: function(y, step, oldStep) {
-            $rootScope.$broadcast("YChanged", y, step, oldStep);
-        }
+app.config([
+    "$interpolateProvider",
+    function($interpolateProvider) {
+        $interpolateProvider.startSymbol("[[");
+        $interpolateProvider.endSymbol("]]");
     }
+]);
+
+app.service("directiveNotifier", ["$rootScope", "scrolleryConfig",
+    function($rootScope, scrolleryConfig) {
+        var animationFinished = false;
+        if (scrolleryConfig.getAnimationOnlyOnce()) {
+            var animationEnd = scrolleryConfig.getAnimationEnd();
+            if (y > animationEnd) {
+                animationFinished = true;
+            }
+        }
+        return {
+            notifyChange: function(y, step, oldStep) {
+                if (!animationFinished) {
+                    $rootScope.$broadcast("YChanged", y, step, oldStep);
+                }
+            }
+        }
 }]);
 
 app.service("windowScroll", ["$window", function($window) {
@@ -51,16 +69,19 @@ app.controller("ScrollerController", [
         $scope.isScrolling = false;
         $scope.currentY = 0;
         $scope.currentStep = 0;
+        $scope.intervalId = 0;
 
         windowScroll.onScroll(function() {
             if (!$scope.isScrolling) {
-                $scope.intervalId = $interval($scope.animateFrame, 1000 / 30);
+                $scope.intervalId = $interval(function() {
+                    $scope.animateFrame($scope.updateIsScrolling);
+                }, 1000 / 30);
             }
         });
 
-        $scope.animateFrame = function() {
+        $scope.animateFrame = function(updateScrolling) {
             // Called by interval.  Notifies directives of change in Y.
-            $scope.updateIsScrolling();
+            updateScrolling($window.scrollY);
             if ($scope.isScrolling) {
                 var oldStep = $scope.currentStep;
                 $scope.updateStep($scope.currentY);
@@ -68,8 +89,7 @@ app.controller("ScrollerController", [
             }
         };
 
-        $scope.updateIsScrolling = function() {
-            var newY = $window.scrollY;
+        $scope.updateIsScrolling = function(newY) {
             if (Math.abs(newY - $scope.currentY) > 1) {
                 if (newY < 0) {
                     // Protects against negative "bounce"
@@ -81,6 +101,7 @@ app.controller("ScrollerController", [
             } else {
                 $scope.isScrolling = false;
                 $interval.cancel();
+                $scope.intervalId = 0;
             }
         };
 
@@ -106,24 +127,24 @@ app.directive("scrollBehavior", ["stepStructure", function(stepStructure) {
     // This directive is added to elements under ScrollerController that have any animation applied.
     function link(scope, element, attrs) {
         // Sets up myAnimations and myProperties from the animations attribute on scope.
-        var myAnimations = angular.fromJson(scope.animations),
-            myProperties = [];
-        angular.forEach(myAnimations, function(animationsObject, step) {
+        scope.myAnimations = angular.fromJson(scope.animations);
+        scope.myProperties = [];
+        angular.forEach(scope.myAnimations, function(animationsObject, step) {
             angular.forEach(animationsObject, function(value, animationProperty) {
-                myProperties.push(animationProperty);
+                scope.myProperties.push(animationProperty);
             });
         });
 
         scope.$on("YChanged", function(event, y, newStep, oldStep) {
             // YChanged is broadcast from the directiveNotifier service.
-            var affectedSteps = getAffectedSteps(newStep, oldStep),
+            var affectedSteps = scope.getAffectedSteps(newStep, oldStep),
                 direction = newStep > oldStep ? 1 : 0; // 1 = forward
             if (affectedSteps.length > 0) {
                 applySteps(newStep, y, affectedSteps, direction);
             }
         });
 
-        function getAffectedSteps(newStep, oldStep) {
+        scope.getAffectedSteps = function(newStep, oldStep) {
             // Makes a list of steps that should be changed.
             // Pushes steps on in order that they should be applied.
             var affectedSteps = [];
@@ -152,7 +173,7 @@ app.directive("scrollBehavior", ["stepStructure", function(stepStructure) {
 
         function calcNewStyles(step, y, finish, direction) {
             var newStyles = [],
-                animations = myAnimations[step],
+                animations = scope.myAnimations[step],
                 stepInfo = stepStructure.getStepInfo(step),
                 oldVal = null,
                 newVal = null;
@@ -167,7 +188,7 @@ app.directive("scrollBehavior", ["stepStructure", function(stepStructure) {
                 } else if (animationProp === "class") {
                     newVal = propValues[1];
                     oldVal = propValues[0];
-                } else if (myProperties.indexOf(animationProp) > -1) {
+                } else if (scope.myProperties.indexOf(animationProp) > -1) {
                     var percentage = (y - stepInfo["start"]) / stepInfo["duration"],
                         difference = Math.abs( Math.abs(propValues[0]) - Math.abs(propValues[1])),
                         sign = propValues[0] > propValues[1] ? "-" : "+",
@@ -210,8 +231,10 @@ app.directive("scrollBehavior", ["stepStructure", function(stepStructure) {
                 } else if (prop == "class") {
                     element.addClass(newVal);
                     element.removeClass(oldVal);
-                } else {
+                } else if (prop == "opacity") {
                     element.css({"opacity": newVal});
+                } else {
+                    throw new Error("Unsupported property type.");
                 }
             };
         };
@@ -227,4 +250,3 @@ app.directive("scrollBehavior", ["stepStructure", function(stepStructure) {
 }]);
 
 })();
-
